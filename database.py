@@ -27,10 +27,27 @@ def create_tables():
     )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        institution_id INTEGER NOT NULL,
+        full_name TEXT NOT NULL,
+        email TEXT UNIQUE,
+        phone TEXT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL,
+        profile_photo TEXT,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (institution_id) REFERENCES institution(id)
+    )
+    """)
+
     connection.commit()
     connection.close()
 
-    print("Institution table created successfully!")
+    print("Tables created successfully!")
 
 
 if __name__ == "__main__":

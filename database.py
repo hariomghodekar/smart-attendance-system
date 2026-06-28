@@ -9,6 +9,7 @@ def create_tables():
     connection = get_connection()
     cursor = connection.cursor()
 
+    # Institution Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS institution (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,6 +28,7 @@ def create_tables():
     )
     """)
 
+    # Accounts Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS accounts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,10 +46,57 @@ def create_tables():
     )
     """)
 
+    # Students Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS students (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id INTEGER NOT NULL,
+        roll_number TEXT,
+        admission_number TEXT,
+        class_name TEXT NOT NULL,
+        section TEXT,
+        department TEXT,
+        semester TEXT,
+        batch TEXT,
+        date_of_birth TEXT,
+        gender TEXT,
+        blood_group TEXT,
+        parent_name TEXT,
+        parent_phone TEXT,
+        emergency_contact TEXT,
+        address TEXT,
+        FOREIGN KEY (account_id) REFERENCES accounts(id)
+    )
+    """)
+
+    # Teachers Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS teachers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id INTEGER NOT NULL,
+        employee_id TEXT UNIQUE,
+        department TEXT,
+        designation TEXT,
+        qualification TEXT,
+        joining_date TEXT,
+        FOREIGN KEY (account_id) REFERENCES accounts(id)
+    )
+    """)
+
+    # Admins Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admins (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id INTEGER NOT NULL,
+        designation TEXT,
+        FOREIGN KEY (account_id) REFERENCES accounts(id)
+    )
+    """)
+
     connection.commit()
     connection.close()
 
-    print("Tables created successfully!")
+    print("All tables created successfully!")
 
 
 if __name__ == "__main__":

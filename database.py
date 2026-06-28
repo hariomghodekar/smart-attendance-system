@@ -9,7 +9,6 @@ def create_tables():
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Institution Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS institution (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,11 +27,10 @@ def create_tables():
     )
     """)
 
-    # Accounts Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS accounts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        institution_id INTEGER NOT NULL,
+        institution_id INTEGER,
         full_name TEXT NOT NULL,
         email TEXT UNIQUE,
         phone TEXT,
@@ -41,12 +39,10 @@ def create_tables():
         role TEXT NOT NULL,
         profile_photo TEXT,
         is_active INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (institution_id) REFERENCES institution(id)
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
-    # Students Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,34 +65,31 @@ def create_tables():
     )
     """)
 
-    # Teachers Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS teachers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id INTEGER NOT NULL,
-        employee_id TEXT UNIQUE,
-        department TEXT,
-        designation TEXT,
-        qualification TEXT,
-        joining_date TEXT,
-        FOREIGN KEY (account_id) REFERENCES accounts(id)
-    )
-    """)
-
-    # Admins Table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS admins (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id INTEGER NOT NULL,
-        designation TEXT,
-        FOREIGN KEY (account_id) REFERENCES accounts(id)
-    )
-    """)
-
     connection.commit()
     connection.close()
 
-    print("All tables created successfully!")
+
+def register_student(full_name, email, phone, username, password, roll_number, class_name):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    INSERT INTO accounts
+    (full_name, email, phone, username, password, role)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (full_name, email, phone, username, password, "Student"))
+
+    account_id = cursor.lastrowid
+
+    cursor.execute("""
+    INSERT INTO students
+    (account_id, roll_number, class_name)
+    VALUES (?, ?, ?)
+    """, (account_id, roll_number, class_name))
+
+    connection.commit()
+    connection.close()
 
 
 if __name__ == "__main__":

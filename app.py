@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
+from database import register_student
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
@@ -11,15 +13,34 @@ def home():
 def student_login():
 
     if request.method == "POST":
-        print("Login button clicked")
-
         roll_number = request.form["roll_number"]
         password = request.form["password"]
 
+        print("Login button clicked")
         print("Roll Number:", roll_number)
         print("Password:", password)
 
     return render_template("student_login.html")
+
+
+@app.route("/student-register", methods=["GET", "POST"])
+def student_register():
+
+    if request.method == "POST":
+
+        register_student(
+            request.form["full_name"],
+            request.form["email"],
+            request.form["phone"],
+            request.form["username"],
+            request.form["password"],
+            request.form["roll_number"],
+            request.form["class_name"]
+        )
+
+        return "Student Registered Successfully!"
+
+    return render_template("student_register.html")
 
 
 if __name__ == "__main__":

@@ -6,11 +6,12 @@ def get_connection():
 
 
 def create_tables():
+
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS institution (
+    CREATE TABLE IF NOT EXISTS institution(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         institution_type TEXT NOT NULL,
@@ -28,7 +29,7 @@ def create_tables():
     """)
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS accounts (
+    CREATE TABLE IF NOT EXISTS accounts(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         institution_id INTEGER,
         full_name TEXT NOT NULL,
@@ -44,7 +45,7 @@ def create_tables():
     """)
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS students (
+    CREATE TABLE IF NOT EXISTS students(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         account_id INTEGER NOT NULL,
         roll_number TEXT,
@@ -61,7 +62,7 @@ def create_tables():
         parent_phone TEXT,
         emergency_contact TEXT,
         address TEXT,
-        FOREIGN KEY (account_id) REFERENCES accounts(id)
+        FOREIGN KEY(account_id) REFERENCES accounts(id)
     )
     """)
 
@@ -76,16 +77,16 @@ def register_student(full_name, email, phone, username, password, roll_number, c
 
     cursor.execute("""
     INSERT INTO accounts
-    (full_name, email, phone, username, password, role)
-    VALUES (?, ?, ?, ?, ?, ?)
+    (full_name,email,phone,username,password,role)
+    VALUES(?,?,?,?,?,?)
     """, (full_name, email, phone, username, password, "Student"))
 
     account_id = cursor.lastrowid
 
     cursor.execute("""
     INSERT INTO students
-    (account_id, roll_number, class_name)
-    VALUES (?, ?, ?)
+    (account_id,roll_number,class_name)
+    VALUES(?,?,?)
     """, (account_id, roll_number, class_name))
 
     connection.commit()
@@ -99,13 +100,13 @@ def get_all_students():
 
     cursor.execute("""
     SELECT
-        students.roll_number,
-        accounts.full_name,
-        accounts.username,
-        students.class_name
+    students.roll_number,
+    accounts.full_name,
+    accounts.username,
+    students.class_name
     FROM students
     INNER JOIN accounts
-    ON students.account_id = accounts.id
+    ON students.account_id=accounts.id
     """)
 
     students = cursor.fetchall()
@@ -113,6 +114,29 @@ def get_all_students():
     connection.close()
 
     return students
+
+
+def get_dashboard_statistics():
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM students")
+    total_students = cursor.fetchone()[0]
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM accounts
+    WHERE role='Teacher'
+    """)
+    total_teachers = cursor.fetchone()[0]
+
+    connection.close()
+
+    return {
+        "students": total_students,
+        "teachers": total_teachers
+    }
 
 
 if __name__ == "__main__":

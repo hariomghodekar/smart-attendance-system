@@ -1,18 +1,29 @@
 from flask import Flask, render_template, request
-from database import register_student, get_all_students
+from database import (
+    register_student,
+    get_all_students,
+    get_dashboard_statistics
+)
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+
+    stats = get_dashboard_statistics()
+
+    return render_template(
+        "index.html",
+        stats=stats
+    )
 
 
 @app.route("/student-login", methods=["GET", "POST"])
 def student_login():
 
     if request.method == "POST":
+
         roll_number = request.form["roll_number"]
         password = request.form["password"]
 
@@ -20,7 +31,7 @@ def student_login():
         print("Roll Number:", roll_number)
         print("Password:", password)
 
-    return render_template("student_login.html")
+    return render_template("student/login.html")
 
 
 @app.route("/student-register", methods=["GET", "POST"])
@@ -40,7 +51,7 @@ def student_register():
 
         return "Student Registered Successfully!"
 
-    return render_template("student_register.html")
+    return render_template("student/register.html")
 
 
 @app.route("/students")
@@ -48,7 +59,10 @@ def students():
 
     students = get_all_students()
 
-    return render_template("students.html", students=students)
+    return render_template(
+        "student/list.html",
+        students=students
+    )
 
 
 if __name__ == "__main__":

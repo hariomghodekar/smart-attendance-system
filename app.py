@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from database import register_student
+from database import register_student, get_all_students
 
 app = Flask(__name__)
 
@@ -41,6 +41,14 @@ def student_register():
         return "Student Registered Successfully!"
 
     return render_template("student_register.html")
+
+
+@app.route("/students")
+def students():
+
+    students = get_all_students()
+
+    return render_template("students.html", students=students)
 
 
 if __name__ == "__main__":

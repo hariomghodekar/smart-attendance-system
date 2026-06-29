@@ -92,5 +92,28 @@ def register_student(full_name, email, phone, username, password, roll_number, c
     connection.close()
 
 
+def get_all_students():
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    SELECT
+        students.roll_number,
+        accounts.full_name,
+        accounts.username,
+        students.class_name
+    FROM students
+    INNER JOIN accounts
+    ON students.account_id = accounts.id
+    """)
+
+    students = cursor.fetchall()
+
+    connection.close()
+
+    return students
+
+
 if __name__ == "__main__":
     create_tables()
